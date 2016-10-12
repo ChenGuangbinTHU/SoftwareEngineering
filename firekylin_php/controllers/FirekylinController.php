@@ -40,11 +40,11 @@ class FirekylinController extends Controller
 
         if(User::findUser($userName))
         {
-            echo('success');
+            return 'success';
         }
         else
         {
-            echo('fail');
+            return 'fail';
         }
     }
 
