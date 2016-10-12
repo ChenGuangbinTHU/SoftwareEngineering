@@ -9,19 +9,21 @@ use yii\helpers\Html;
 
 $this->title = $name;
 ?>
-<div class="site-error">
+<html>
+<head>
+    <script type="text/javascript">
+        function display_alert()
+        {
+            alert("I am an alert box!!")
+        }
+    </script>
+</head>
+<body>
 
-    <h1><?= Html::encode($this->title) ?></h1>
+<script type="text/javascript">
 
-    <div class="alert alert-danger">
-        <?= nl2br(Html::encode($message)) ?>
-    </div>
+        alert("I am an alert box!!")
 
-    <p>
-        The above error occurred while the Web server was processing your request.
-    </p>
-    <p>
-        Please contact us if you think this is a server error. Thank you.
-    </p>
-
-</div>
+</script>
+</body>
+</html>

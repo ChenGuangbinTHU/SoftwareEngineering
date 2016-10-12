@@ -15,6 +15,7 @@ use Yii;
 
 
 
+
 class FirekylinController extends Controller
 {
     public $enableCsrfValidation = false;
@@ -30,6 +31,28 @@ class FirekylinController extends Controller
         $user->save();
         echo('success');
     }
+
+    public function actionFinduser()
+    {
+        $post_data = Yii::$app->request->post();
+        $userName = $post_data['name'];
+
+
+        if(User::findUser($userName))
+        {
+            echo('success');
+        }
+        else
+        {
+            echo('fail');
+        }
+    }
+
+//    public function actionUserdevice()
+//    {
+//        $post_data = Yii::$app->request->post();
+//
+//    }
 
     public function actionIndex()
     {
