@@ -67,8 +67,37 @@ class FirekylinController extends Controller
         $user_device->save();
     }
 
+    public function readPHP()
+    {
+        $path = 'C:/Users/bingochen/Desktop/Junior/1.xlsx';
+        $PHPExcel = new \PHPExcel();
+        $PHPReader = new \PHPExcel_Reader_Excel2007();
+        if (!$PHPReader->canRead($path)) { // 这里是用Reader尝试去读文件，07不行用05，05不行就报错。注意，这里的return是Yii框架的方式。
+            $PHPReader = new \PHPExcel_Reader_Excel5();
+
+            if (!$PHPReader->canRead($path))
+            {
+                $errorMessage = "Can not read file.";
+                return $errorMessage;
+            }
+        }
+        $PHPExcel = $PHPReader->load($path);
+        $currentSheet = $PHPExcel->getSheet(0);
+        $highestRow = $currentSheet->getHighestRow();
+        $highestColumn = $currentSheet->getHighestColumn();
+        for($row = 1;$row <= $highestRow;$row++)
+        {
+            for($column = 'A';$column <= $highestColumn;$column++)
+            {
+                $dataset[] = $currentSheet->getCell($column.$row)->getValue();
+                echo $column.$row.":".$currentSheet->getCell($column.$row)->getValue()."<br />";
+            }
+        }
+    }
+
     public function actionIndex()
     {
-        echo(json_encode(['user_id'=>'666','os_type'=>'apple','channel'=>'light','device_id'=>'2132']));
+        //echo(json_encode(['user_id'=>'666','os_type'=>'apple','channel'=>'light','device_id'=>'2132']));
+        $this->readPHP();
     }
 }
