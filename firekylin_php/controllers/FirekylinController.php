@@ -8,18 +8,26 @@
 
 namespace app\controllers;
 
+use app\models\Message;
 use yii\web\Controller;
 use app\models\statistic;
 use app\models\user;
 use app\models\userdevice;
 use Yii;
-
+use yii\web\UploadedFile;
 
 
 
 class FirekylinController extends Controller
 {
     public $enableCsrfValidation = false;
+    private $uploadPath = '';
+
+    function __construct($id, $module, $config = [])
+    {
+        parent::__construct($id, $module, $config = []);
+        $this->uploadPath = Yii::$app->basePath.'//uploads//';
+    }
 
     public function actionRegister()
     {
@@ -67,9 +75,8 @@ class FirekylinController extends Controller
         $user_device->save();
     }
 
-    public function readPHP()
+    public function parseExcel($path)
     {
-        $path = 'C:/Users/bingochen/Desktop/Junior/1.xlsx';
         $PHPExcel = new \PHPExcel();
         $PHPReader = new \PHPExcel_Reader_Excel2007();
         if (!$PHPReader->canRead($path)) { // 这里是用Reader尝试去读文件，07不行用05，05不行就报错。注意，这里的return是Yii框架的方式。
@@ -85,19 +92,79 @@ class FirekylinController extends Controller
         $currentSheet = $PHPExcel->getSheet(0);
         $highestRow = $currentSheet->getHighestRow();
         $highestColumn = $currentSheet->getHighestColumn();
+        $userIDArray = array();
+        $count = 0;
         for($row = 1;$row <= $highestRow;$row++)
         {
             for($column = 'A';$column <= $highestColumn;$column++)
             {
-                $dataset[] = $currentSheet->getCell($column.$row)->getValue();
-                echo $column.$row.":".$currentSheet->getCell($column.$row)->getValue()."<br />";
+                $value = $currentSheet->getCell($column.$row);
+                if($value == '')
+                    continue;
+               $userIDArray[$count++] = $value;
             }
         }
+        return $userIDArray;
+
+    }
+
+
+    public function fileExists($filePath)
+    {
+        if(!file_exists($filePath)){
+            mkdir($filePath);
+        }
+        return $filePath;
+    }
+
+    function uuid($prefix = '')
+    {
+        $chars = md5(uniqid(mt_rand(), true));
+        $uuid  = substr($chars,0,8) . '-';
+        $uuid .= substr($chars,8,4) . '-';
+        $uuid .= substr($chars,12,4) . '-';
+        $uuid .= substr($chars,16,4) . '-';
+        $uuid .= substr($chars,20,12);
+        return $prefix . $uuid;
+    }
+
+    public function actionSendMessage()
+    {
+        $message = new Message();
+        $this->fileExists($this->uploadPath);
+        if(Yii::$app->request->isPost)
+        {
+            $post_data = Yii::$app->request->post();
+            $userIDArray = null;
+            if ($_FILES["file"]["type"] == "application/vnd.ms-excel" || $_FILES["file"]["type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                $filepath = "upload/" . $_FILES["file"]["name"];
+                $this->fileExists("upload/");
+                move_uploaded_file($_FILES["file"]["tmp_name"],
+                    $filepath);
+                $userIDArray = $this->parseExcel($filepath);
+            }
+            else
+            {
+                echo "<script>alert('请上传Excel文件');</script>";
+            }
+
+
+
+        }
+
+        return $this->render('message',['message' => $message]);
+
+
+
+
+
+
     }
 
     public function actionIndex()
     {
         //echo(json_encode(['user_id'=>'666','os_type'=>'apple','channel'=>'light','device_id'=>'2132']));
-        $this->readPHP();
+        //$this->parseExcel();
     }
 }

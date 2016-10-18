@@ -11,8 +11,6 @@ use yii\bootstrap\Alert;
 
 ?>
 
-
-
 <?php
 if( Yii::$app->getSession()->hasFlash('success') ) {
     echo Alert::widget([
