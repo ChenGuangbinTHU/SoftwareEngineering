@@ -14,7 +14,7 @@ use app\models\statistic;
 use app\models\user;
 use app\models\userdevice;
 use Yii;
-use yii\web\UploadedFile;
+
 
 class DeviceOS
 {
@@ -41,47 +41,74 @@ class FirekylinController extends Controller
 
     public function actionRegister()
     {
-        $post_data = Yii::$app->request->post();
-        $user = new User();
-        $user->id = $post_data['id'];
-        $user->name = $post_data['name'];
-        $user->password = $post_data['password'];
-        if($user->save())
-            return json_encode(['message'=>'success']);
-        return json_encode(['message'=>'fail']);
-
-    }
-
-    public function actionFinduser()
-    {
-        $post_data = Yii::$app->request->post();
-        $userName = $post_data['name'];
-        if(User::findUser($userName))
+        if(Yii::$app->request->isPost)
         {
-            $user_id = User::findOne(['name'=>$userName])->id;
-            return json_encode(['message'=>'success','user_id'=>$user_id]);
-        }
-        else
-        {
-            return json_encode(['message'=>'fail','user_id'=>'0']);
+            $post_data = Yii::$app->request->post();
+            $user = new User();
+            $user->id = $post_data['id'];
+            $user->name = $post_data['name'];
+            $user->password = $post_data['password'];
+            if($user->save())
+                return json_encode(['message'=>'success']);
+            return json_encode(['message'=>'fail']);
         }
     }
 
-    public function actionUserdevice()
+    public function actionFindUser()
     {
-        $post_data = Yii::$app->request->post();
-        $user_id = $post_data['user_id'];
-        $os_type = $post_data['os_type'];
-        $channel = $post_data['channel'];
-        $device_id = $post_data['device_id'];
-        $user_device = UserDevice::findOne(['user_id'=>$user_id]);
-        if($user_device == null)
-            $user_device = new UserDevice();
-        $user_device->user_id = $user_id;
-        $user_device->os_type = $os_type;
-        $user_device->channel = $channel;
-        $user_device->device_id = $device_id;
-        $user_device->save();
+        if(Yii::$app->request->isPost)
+        {
+            $post_data = Yii::$app->request->post();
+            $userName = $post_data['name'];
+            if(User::findUser($userName))
+            {
+                $user_id = User::findOne(['name'=>$userName])->id;
+                return json_encode(['message'=>'success','user_id'=>$user_id]);
+            }
+            else
+            {
+                return json_encode(['message'=>'fail','user_id'=>'0']);
+            }
+        }
+    }
+
+    public function actionUserDevice()
+    {
+        if(Yii::$app->request->isPost)
+        {
+            $post_data = Yii::$app->request->post();
+            $user_id = $post_data['user_id'];
+            $os_type = $post_data['os_type'];
+            $channel = $post_data['channel'];
+            $device_id = $post_data['device_id'];
+            $user_device = UserDevice::findOne(['user_id'=>$user_id]);
+            if($user_device == null)
+                $user_device = new UserDevice();
+            $user_device->user_id = $user_id;
+            $user_device->os_type = $os_type;
+            $user_device->channel = $channel;
+            $user_device->device_id = $device_id;
+            $user_device->save();
+        }
+
+    }
+
+    public function actionStatistic()
+    {
+        if(Yii::$app->request->isPost)
+        {
+            $post_data = Yii::$app->request->post();
+            $statistic = Statistic::findOne(['uuid'=>$post_data['uuid']]);
+            if($statistic == null)
+                $statistic = new Statistic();
+            $statistic->uuid = $post_data['uuid'];
+            $statistic->user_id = $post_data['user_id'];
+            $statistic->os_type = $post_data['os_type'];
+            $statistic->channel = $post_data['channel'];
+            $statistic->device_id = $post_data['device_id'];
+            $statistic->status = $post_data['status'];
+            $statistic->save();
+        }
     }
 
     public function parseExcel($path)
@@ -230,17 +257,16 @@ class FirekylinController extends Controller
                 }
             }
 
-            //$message->users = $this->array2String($userIDArray);
-            //$message->save();
+            $message->users = $this->array2String($userIDArray);
+            $message->save();
 
             $jsonData = json_encode(['other'=>$otherInfoArray,'message'=>$messageInfoArray,'device_os'=>$deviceOSArray,'channel'=>$channelArray,'params'=>$paramArray]);
             $url = 'http://h1pvq.ngrok.natapp.cn/';
             $this->send_post($url,'_heng'.$jsonData.'gneh_');
         }
-        //$arr = array(new DeviceOS('213','sadsda'),new DeviceOS('12312','ghg'),new DeviceOS('12','gh21g'));
-        //return json_encode(['device_os'=>$arr]);
         return $this->render('message');
     }
+
 
     function send_post($url, $params)
     {
@@ -254,7 +280,7 @@ class FirekylinController extends Controller
         curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-        curl_setopt($ch, CURLOPT_TIMEOUT,5);
+        curl_setopt($ch, CURLOPT_TIMEOUT,3);
         $res = curl_exec($ch);
         curl_close($ch);
         var_dump($res);
@@ -262,7 +288,7 @@ class FirekylinController extends Controller
 
     public function actionIndex()
     {
-        //echo(json_encode(['user_id'=>'666','os_type'=>'apple','channel'=>'light','device_id'=>'2132']));
+        echo(json_encode(['uuid'=>'adssasda','os_type'=>'Android','user_id'=>'213221','channel'=>'getui','device_id'=>'123456','status'=>'RECEIVE']));
         //$this->parseExcel();
     }
 }
