@@ -12,5 +12,5 @@ use yii\db\ActiveRecord;
 
 class Message extends ActiveRecord
 {
-    
+
 }

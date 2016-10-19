@@ -16,7 +16,17 @@ use app\models\userdevice;
 use Yii;
 use yii\web\UploadedFile;
 
+class DeviceOS
+{
+    public $osType;
+    public $deviceID;
 
+    public function __construct($_osType,$_deviceID)
+    {
+        $this->osType = $_osType;
+        $this->deviceID = $_deviceID;
+    }
+}
 
 class FirekylinController extends Controller
 {
@@ -150,6 +160,8 @@ class FirekylinController extends Controller
         $osTypeArray = array();
         $channelArray = array();
         $paramArray = array();
+        $userDeviceArray = null;
+        $deviceOSArray = array();
 
         $uuid = $this->uuid();
         $time = date('Y-m-d h:i:s',time());
@@ -209,15 +221,43 @@ class FirekylinController extends Controller
                 return $this->render('message');
             }
 
-            $message->users = $this->array2String($userIDArray);
-            $message->save();
+            foreach($userIDArray as $userID)
+            {
+                $userDeviceArray = UserDevice::findAll(['user_id'=>$userID]);
+                foreach($userDeviceArray as $i)
+                {
+                    array_push($deviceOSArray,new DeviceOS($i->os_type,$i->device_id));
+                }
+            }
 
-            return json_encode(['other'=>$otherInfoArray,'message'=>$messageInfoArray,'os_type'=>$osTypeArray,'channel'=>$channelArray,'userID'=>$userIDArray,'params'=>$paramArray]);
+            //$message->users = $this->array2String($userIDArray);
+            //$message->save();
+
+            $jsonData = json_encode(['other'=>$otherInfoArray,'message'=>$messageInfoArray,'device_os'=>$deviceOSArray,'channel'=>$channelArray,'params'=>$paramArray]);
+            $url = 'http://h1pvq.ngrok.natapp.cn/';
+            $this->send_post($url,'_heng'.$jsonData.'gneh_');
         }
-
+        //$arr = array(new DeviceOS('213','sadsda'),new DeviceOS('12312','ghg'),new DeviceOS('12','gh21g'));
+        //return json_encode(['device_os'=>$arr]);
         return $this->render('message');
+    }
 
-
+    function send_post($url, $params)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($params)
+        ));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+        curl_setopt($ch, CURLOPT_TIMEOUT,5);
+        $res = curl_exec($ch);
+        curl_close($ch);
+        var_dump($res);
     }
 
     public function actionIndex()
@@ -226,3 +266,5 @@ class FirekylinController extends Controller
         //$this->parseExcel();
     }
 }
+
+
