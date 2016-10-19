@@ -32,7 +32,6 @@ class FirekylinController extends Controller
     public function actionRegister()
     {
         $post_data = Yii::$app->request->post();
-        echo($post_data);
         $user = new User();
         $user->id = $post_data['id'];
         $user->name = $post_data['name'];
@@ -98,10 +97,10 @@ class FirekylinController extends Controller
         {
             for($column = 'A';$column <= $highestColumn;$column++)
             {
-                $value = $currentSheet->getCell($column.$row);
+                $value = $currentSheet->getCell($column.$row)->getValue();
                 if($value == '')
                     continue;
-               $userIDArray[$count++] = $value;
+               array_push($userIDArray,(string)$value);
             }
         }
         return $userIDArray;
@@ -128,14 +127,74 @@ class FirekylinController extends Controller
         return $prefix . $uuid;
     }
 
+    public function array2String($arr)
+    {
+        $result = '';
+        if(count($arr) > 0)
+        {
+            foreach($arr as $i)
+            {
+                $result .= ($i.',');
+            }
+        }
+        return $result;
+    }
+
     public function actionSendMessage()
     {
         $message = new Message();
-        $this->fileExists($this->uploadPath);
+
+        $otherInfoArray = array();
+        $messageInfoArray = array();
+        $userIDArray = null;
+        $osTypeArray = array();
+        $channelArray = array();
+        $paramArray = array();
+
+        $uuid = $this->uuid();
+        $time = date('Y-m-d h:i:s',time());
+
+        array_push($otherInfoArray,$uuid,$time);
+
+        $message->uuid = $uuid;
+        $message->time = $time;
+        $message->params = $this->array2String($paramArray);
+
         if(Yii::$app->request->isPost)
         {
             $post_data = Yii::$app->request->post();
-            $userIDArray = null;
+
+            $message->title = $post_data['title'];
+            $message->content = $post_data['content'];
+
+            array_push($messageInfoArray,$post_data['title'],$post_data['content']);
+
+            if(count($post_data['os_type_choices']) > 0)
+            {
+                foreach($post_data['os_type_choices'] as $i)
+                {
+                    array_push($osTypeArray,$i);
+                }
+            }
+            else
+            {
+                echo "<script>alert('设备类型不能为空');</script>";
+                return $this->render('message');
+            }
+
+            if(count($post_data['channel_choices']) > 0)
+            {
+                foreach($post_data['channel_choices'] as $i)
+                {
+                    array_push($channelArray,$i);
+                }
+            }
+            else
+            {
+                echo "<script>alert('渠道不能为空');</script>";
+                return $this->render('message');
+            }
+
             if ($_FILES["file"]["type"] == "application/vnd.ms-excel" || $_FILES["file"]["type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {
                 $filepath = "upload/" . $_FILES["file"]["name"];
@@ -147,17 +206,16 @@ class FirekylinController extends Controller
             else
             {
                 echo "<script>alert('请上传Excel文件');</script>";
+                return $this->render('message');
             }
 
+            $message->users = $this->array2String($userIDArray);
+            $message->save();
 
-
+            return json_encode(['other'=>$otherInfoArray,'message'=>$messageInfoArray,'os_type'=>$osTypeArray,'channel'=>$channelArray,'userID'=>$userIDArray,'params'=>$paramArray]);
         }
 
-        return $this->render('message',['message' => $message]);
-
-
-
-
+        return $this->render('message');
 
 
     }

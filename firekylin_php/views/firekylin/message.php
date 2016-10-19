@@ -31,7 +31,7 @@ use yii\helpers\Html;
 <!--    <button type="submit" class="btn btn-default">提交</button>-->
 <!--</form>-->
 
-<form action="index.php?r=firekylin%2Fsend-message" method="post" accept-charset="gbk"
+<form action="index.php?r=firekylin%2Fsend-message" method="post" accept-charset="utf-8"
       enctype="multipart/form-data">
 
     <div class="form-group">
@@ -55,7 +55,7 @@ use yii\helpers\Html;
         </label>
     </div>
 
-    <label for="name">请选择要发送的设备类型</label>
+    <label for="name">请选择要发送的渠道</label>
     <div>
         <label class="checkbox-inline">
             <input type="checkbox" id="inlineCheckbox3" value="getui" name="channel_choisces[]">个推

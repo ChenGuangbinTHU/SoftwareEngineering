@@ -8,22 +8,9 @@
 
 namespace app\models;
 
-class Message extends \yii\base\Model
-{
-    public $uuid;
-    public $users;
-    public $os_type;
-    public $channel;
-    public $title;
-    public $content;
-    public $time;
-    public $param;
-    public $file;
+use yii\db\ActiveRecord;
 
-    public function rules()
-    {
-        return [
-            [['file'],'file'],
-        ];
-    }
+class Message extends ActiveRecord
+{
+    
 }
