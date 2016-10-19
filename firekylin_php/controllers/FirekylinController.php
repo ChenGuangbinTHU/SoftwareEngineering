@@ -8,6 +8,7 @@
 
 namespace app\controllers;
 
+use app\models\HistoryForm;
 use app\models\Message;
 use yii\web\Controller;
 use app\models\statistic;
@@ -32,6 +33,7 @@ class FirekylinController extends Controller
     public function actionRegister()
     {
         $post_data = Yii::$app->request->post();
+        echo($post_data);
         $user = new User();
         $user->id = $post_data['id'];
         $user->name = $post_data['name'];
@@ -91,22 +93,15 @@ class FirekylinController extends Controller
         $currentSheet = $PHPExcel->getSheet(0);
         $highestRow = $currentSheet->getHighestRow();
         $highestColumn = $currentSheet->getHighestColumn();
-        $userIDArray = array();
-        $count = 0;
         for($row = 1;$row <= $highestRow;$row++)
         {
             for($column = 'A';$column <= $highestColumn;$column++)
             {
-                $value = $currentSheet->getCell($column.$row)->getValue();
-                if($value == '')
-                    continue;
-               array_push($userIDArray,(string)$value);
+                $dataset[] = $currentSheet->getCell($column.$row)->getValue();
+                echo $column.$row.":".$currentSheet->getCell($column.$row)->getValue()."<br />";
             }
         }
-        return $userIDArray;
-
     }
-
 
     public function fileExists($filePath)
     {
@@ -127,98 +122,76 @@ class FirekylinController extends Controller
         return $prefix . $uuid;
     }
 
-    public function array2String($arr)
-    {
-        $result = '';
-        if(count($arr) > 0)
-        {
-            foreach($arr as $i)
-            {
-                $result .= ($i.',');
-            }
-        }
-        return $result;
-    }
-
     public function actionSendMessage()
     {
         $message = new Message();
-
-        $otherInfoArray = array();
-        $messageInfoArray = array();
-        $userIDArray = null;
-        $osTypeArray = array();
-        $channelArray = array();
-        $paramArray = array();
-
-        $uuid = $this->uuid();
-        $time = date('Y-m-d h:i:s',time());
-
-        array_push($otherInfoArray,$uuid,$time);
-
-        $message->uuid = $uuid;
-        $message->time = $time;
-        $message->params = $this->array2String($paramArray);
-
+        $this->fileExists($this->uploadPath);
         if(Yii::$app->request->isPost)
         {
-            $post_data = Yii::$app->request->post();
-
-            $message->title = $post_data['title'];
-            $message->content = $post_data['content'];
-
-            array_push($messageInfoArray,$post_data['title'],$post_data['content']);
-
-            if(count($post_data['os_type_choices']) > 0)
-            {
-                foreach($post_data['os_type_choices'] as $i)
-                {
-                    array_push($osTypeArray,$i);
-                }
-            }
-            else
-            {
-                echo "<script>alert('设备类型不能为空');</script>";
-                return $this->render('message');
-            }
-
-            if(count($post_data['channel_choices']) > 0)
-            {
-                foreach($post_data['channel_choices'] as $i)
-                {
-                    array_push($channelArray,$i);
-                }
-            }
-            else
-            {
-                echo "<script>alert('渠道不能为空');</script>";
-                return $this->render('message');
-            }
-
-            if ($_FILES["file"]["type"] == "application/vnd.ms-excel" || $_FILES["file"]["type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            {
-                $filepath = "upload/" . $_FILES["file"]["name"];
-                $this->fileExists("upload/");
-                move_uploaded_file($_FILES["file"]["tmp_name"],
-                    $filepath);
-                $userIDArray = $this->parseExcel($filepath);
-            }
-            else
-            {
-                echo "<script>alert('请上传Excel文件');</script>";
-                return $this->render('message');
-            }
-
-            $message->users = $this->array2String($userIDArray);
-            $message->save();
-
-            return json_encode(['other'=>$otherInfoArray,'message'=>$messageInfoArray,'os_type'=>$osTypeArray,'channel'=>$channelArray,'userID'=>$userIDArray,'params'=>$paramArray]);
+            $message->file = UploadedFile::getInstance($message,'file');
+            $filePath = $this->uploadPath.$message->file->baseName.'.'.$message->file->extension;
+            $message->file->saveAs($filePath);
+            return $this->uuid();
         }
 
-        return $this->render('message');
-
-
+        return $this->render('message',['message' => $message]);
     }
+
+    public function actionInquiryHistory()
+    {
+        $model = new HistoryForm();
+        if ($model->load(Yii::$app->request->post())) {
+            $msgID = $model->id;
+
+            $model->content = Message::findOne(['uuid' => $msgID])->content;
+
+            //发送数
+            $model->sendNum = 1;
+            $usersID = array();
+            $temp = 0;
+            $usersStr = Message::findOne(['uuid' => $msgID])->users;
+            for ($i = 0; $i < strlen($usersStr); $i++) {
+                if ($usersStr[$i] == ',') {
+                    $model->sendNum++;
+                    for ($j = $temp; $j < $i; $j++) {
+                        $usersID[$model->sendNum-2] .= $usersStr[$j];
+                    }
+                    $temp = $i + 1;
+                }
+            }
+            for ($k = $temp; $k < strlen($usersStr); $k++) {
+                $usersID[$model->sendNum - 1] .= $usersStr[$k];
+            }
+
+
+
+            //设备个数
+                $deviceStr = array();
+                $deviceStr = statistic::findALL(['uuid'=>$msgID]);
+                $model->deviceNum  += count($deviceStr);
+
+
+            //到达数显示数点击数
+            $model->reachNum = 0;
+            $model->showNum = 0;
+            $model->clickNum = 0;
+
+
+            $mes_status = array();
+            $mes_status = statistic::findAll(['uuid'=>$msgID]);
+
+            for($q=0;$q<count($mes_status);$q++){
+                if($mes_status[$q]->status == 'RECEIVED') $model->reachNum++;
+                if($mes_status[$q]->status == 'SHOWED') $model->showNum++;
+                if($mes_status[$q]->status == 'CLICKED') $model->clickNum++;
+            }
+            return $this->render('showhistory', ['model' => $model]);
+        }
+        else{
+            return $this->render('inquiryhistory',['model'=>$model]);
+        }
+    }
+
 
     public function actionIndex()
     {
