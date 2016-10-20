@@ -221,12 +221,9 @@ class FirekylinController extends Controller
                 return $this->render('message');
             }
 
-            if(count($post_data['channel_choices']) > 0)
+            if($post_data['channel_choices'] != null)
             {
-                foreach($post_data['channel_choices'] as $i)
-                {
-                    array_push($channelArray,$i);
-                }
+                    array_push($channelArray,$post_data['channel_choices']);
             }
             else
             {
@@ -253,7 +250,8 @@ class FirekylinController extends Controller
                 $userDeviceArray = UserDevice::findAll(['user_id'=>$userID]);
                 foreach($userDeviceArray as $i)
                 {
-                    array_push($deviceOSArray,new DeviceOS($i->os_type,$i->device_id));
+                    if(in_array($i->os_type,$osTypeArray))
+                        array_push($deviceOSArray,new DeviceOS($i->os_type,$i->device_id));
                 }
             }
 
@@ -261,6 +259,7 @@ class FirekylinController extends Controller
             $message->save();
 
             $jsonData = json_encode(['other'=>$otherInfoArray,'message'=>$messageInfoArray,'device_os'=>$deviceOSArray,'channel'=>$channelArray,'params'=>$paramArray]);
+            return $jsonData;
             $url = 'http://h1pvq.ngrok.natapp.cn/';
             $this->send_post($url,'_heng'.$jsonData.'gneh_');
         }
@@ -289,7 +288,6 @@ class FirekylinController extends Controller
     public function actionIndex()
     {
         echo(json_encode(['uuid'=>'adssasda','os_type'=>'Android','user_id'=>'213221','channel'=>'getui','device_id'=>'123456','status'=>'RECEIVE']));
-        //$this->parseExcel();
     }
 }
 

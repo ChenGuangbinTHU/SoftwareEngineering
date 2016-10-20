@@ -11,26 +11,6 @@ use yii\helpers\Html;
 
 ?>
 
-
-
-<!--<form role="form" action="index.php?r=firekylin%2Fsend-message" method="post">-->
-<!--    <div class="form-group">-->
-<!--        <label for="name">名称</label>-->
-<!--        <input type="text" class="form-control" id="name" placeholder="请输入名称">-->
-<!--    </div>-->
-<!--    <div class="form-group">-->
-<!--        <label for="inputfile">文件输入</label>-->
-<!--        <input type="file" id="inputfile">-->
-<!--        <p class="help-block">这里是块级帮助文本的实例。</p>-->
-<!--    </div>-->
-<!--    <div class="checkbox">-->
-<!--        <label>-->
-<!--            <input type="checkbox">请打勾-->
-<!--        </label>-->
-<!--    </div>-->
-<!--    <button type="submit" class="btn btn-default">提交</button>-->
-<!--</form>-->
-
 <form action="index.php?r=firekylin%2Fsend-message" method="post" accept-charset="utf-8"
       enctype="multipart/form-data">
 
@@ -56,12 +36,12 @@ use yii\helpers\Html;
     </div>
 
     <label for="name">请选择要发送的渠道</label>
-    <div>
-        <label class="checkbox-inline">
-            <input type="checkbox" id="inlineCheckbox3" value="getui" name="channel_choisces[]">个推
+    <div align="left">
+        <label class="radio-inline">
+            <input type="radio" id="optionsRadios1" value="jiguang" name="channel_choices"/>极光
         </label>
-        <label class="checkbox-inline">
-            <input type="checkbox" id="inlineCheckbox4" value="jiguang" name="channel_choices[]">极光
+        <label class="radio-inline">
+            <input type="radio" id="optionsRadios2" value="getui" name="channel_choices"/>个推
         </label>
     </div>
 
