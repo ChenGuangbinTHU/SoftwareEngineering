@@ -1,15 +1,28 @@
 <?php
+
 /**
+
  * Created by PhpStorm.
+
  * User: bingochen
+
  * Date: 2016/10/17
+
  * Time: 10:55
+
  */
 
+
+
 use yii\widgets\ActiveForm;
+
 use yii\helpers\Html;
 
+
+
 ?>
+
+
 
 <form action="index.php?r=firekylin%2Fsend-message" method="post" accept-charset="utf-8"
       enctype="multipart/form-data">
@@ -19,11 +32,12 @@ use yii\helpers\Html;
         <input type="text" class="form-control" id="title" name="title" placeholder="请输入推送标题">
     </div>
 
+
+
     <div class="form-group">
         <label for="name">推送内容</label>
         <textarea class="form-control" rows="3" id="content" name="content" placeholder="请输入推送内容"></textarea>
     </div>
-
 
     <label for="name">请选择要发送的设备类型</label>
     <div>
@@ -35,11 +49,14 @@ use yii\helpers\Html;
         </label>
     </div>
 
+
+
     <label for="name">请选择要发送的渠道</label>
     <div align="left">
         <label class="radio-inline">
             <input type="radio" id="optionsRadios1" value="jiguang" name="channel_choices"/>极光
         </label>
+
         <label class="radio-inline">
             <input type="radio" id="optionsRadios2" value="getui" name="channel_choices"/>个推
         </label>
@@ -52,5 +69,3 @@ use yii\helpers\Html;
     </div>
     <input type="submit" name="submit" value="Submit" />
 </form>
-
-

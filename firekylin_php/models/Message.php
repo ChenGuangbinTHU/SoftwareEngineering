@@ -8,9 +8,7 @@
 
 namespace app\models;
 
-use yii\db\ActiveRecord;
-
-class Message extends ActiveRecord
+class Message extends \yii\db\ActiveRecord
 {
 
 }
