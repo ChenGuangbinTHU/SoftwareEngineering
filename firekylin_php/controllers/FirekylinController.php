@@ -235,6 +235,7 @@ class FirekylinController extends Controller
             {
                 $filepath = "upload/" . $_FILES["file"]["name"];
                 $this->fileExists("upload/");
+                echo($_FILES["file"]["tmp_name"]);
                 move_uploaded_file($_FILES["file"]["tmp_name"],
                     $filepath);
                 $userIDArray = $this->parseExcel($filepath);
@@ -259,8 +260,8 @@ class FirekylinController extends Controller
             $message->save();
 
             $jsonData = json_encode(['other'=>$otherInfoArray,'message'=>$messageInfoArray,'device_os'=>$deviceOSArray,'channel'=>$channelArray,'params'=>$paramArray]);
-            return $jsonData;
-            $url = 'http://h1pvq.ngrok.natapp.cn/';
+            //return $jsonData;
+            $url = 'http://afjm5.ngrok.natapp.cn/';
             $this->send_post($url,'_heng'.$jsonData.'gneh_');
         }
         return $this->render('message');
@@ -279,7 +280,7 @@ class FirekylinController extends Controller
         curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-        curl_setopt($ch, CURLOPT_TIMEOUT,3);
+        curl_setopt($ch, CURLOPT_TIMEOUT,5);
         $res = curl_exec($ch);
         curl_close($ch);
         var_dump($res);
