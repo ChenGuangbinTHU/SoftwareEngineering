@@ -9,6 +9,7 @@
 namespace app\controllers;
 
 use app\models\HistoryForm;
+use app\models\LoginSiteForm;
 use app\models\Message;
 use yii\web\Controller;
 use app\models\statistic;
@@ -137,6 +138,7 @@ class FirekylinController extends Controller
         return $this->render('message',['message' => $message]);
     }
 
+    
     public function actionInquiryHistory()
     {
         $model = new HistoryForm();
@@ -189,6 +191,23 @@ class FirekylinController extends Controller
         }
         else{
             return $this->render('inquiryhistory',['model'=>$model]);
+        }
+    }
+
+    public function actionLoginSite()//登陆界面
+    {
+        $model = new LoginSiteForm();
+        if($model->load(Yii::$app->request->post())){
+            if($model->username=='admin'&&$model->password=='admin'){
+                return $this->redirect('index.php?r=firekylin/send-message');
+            }
+            else {
+                \Yii::$app->getSession()->setFlash('error', 'Incorrect username or password');
+                return $this->goBack('index.php?r=firekylin/login-site');
+            }
+        }
+        else{
+            return $this->render('login',['model'=>$model]);
         }
     }
 
