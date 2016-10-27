@@ -49,6 +49,8 @@ class FirekylinController extends Controller
             $user->id = $post_data['id'];
             $user->name = $post_data['name'];
             $user->password = $post_data['password'];
+            if(User::findOne(['name',$post_data['name']]))
+                return json_encode(['message'=>'fail']);
             if($user->save())
                 return json_encode(['message'=>'success']);
             return json_encode(['message'=>'fail']);
@@ -83,9 +85,21 @@ class FirekylinController extends Controller
             $os_type = $post_data['os_type'];
             $channel = $post_data['channel'];
             $device_id = $post_data['device_id'];
-            $user_device = UserDevice::findOne(['user_id'=>$user_id]);
-            if($user_device == null)
-                $user_device = new UserDevice();
+            if($device_id == null)
+                return;
+            $user_device = UserDevice::findOne(['device_id'=>$device_id]);
+            if($user_device != null)
+            {
+                $user_device->user_id = $user_id;
+                $user_device->os_type = $os_type;
+                $user_device->channel = $channel;
+                $user_device->device_id = $device_id;
+                $user_device->save();
+                return;
+            }
+
+
+            $user_device = new UserDevice();
             $user_device->user_id = $user_id;
             $user_device->os_type = $os_type;
             $user_device->channel = $channel;
@@ -251,8 +265,8 @@ class FirekylinController extends Controller
             $message->users = $this->array2String($userIDArray);
             $message->save();
             $jsonData = json_encode(['other'=>$otherInfoArray,'message'=>$messageInfoArray,'device_os'=>$deviceOSArray,'channel'=>$channelArray,'params'=>$paramArray]);
-            return $jsonData;
-            $url = 'http://h1pvq.ngrok.natapp.cn/';
+            //return $jsonData;
+            $url = 'http://3gifd.free.natapp.cc/';
             $this->send_post($url,'_heng'.$jsonData.'gneh_');
         }
         return $this->render('message');
@@ -329,7 +343,8 @@ class FirekylinController extends Controller
 
     public function actionIndex()
     {
-        echo(json_encode(['uuid'=>'adssasda','os_type'=>'Android','user_id'=>'213221','channel'=>'getui','device_id'=>'123456','status'=>'RECEIVE']));
+        //echo(json_encode(['uuid'=>'adssasda','os_type'=>'Android','user_id'=>'213221','channel'=>'getui','device_id'=>'123456','status'=>'RECEIVE']));
+        return $this->render('test');
     }
 
 }
