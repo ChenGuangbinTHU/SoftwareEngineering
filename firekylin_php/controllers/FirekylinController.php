@@ -9,7 +9,9 @@
 namespace app\controllers;
 
 use app\models\HistoryForm;
+use app\models\LoginSiteForm;
 use app\models\Message;
+use yii\base\Object;
 use yii\web\Controller;
 use app\models\statistic;
 use app\models\user;
@@ -266,12 +268,11 @@ class FirekylinController extends Controller
             $message->save();
             $jsonData = json_encode(['other'=>$otherInfoArray,'message'=>$messageInfoArray,'device_os'=>$deviceOSArray,'channel'=>$channelArray,'params'=>$paramArray]);
             //return $jsonData;
-            $url = 'http://3gifd.free.natapp.cc/';
+            $url = 'http://hv3rk.free.natapp.cc/';
             $this->send_post($url,'_heng'.$jsonData.'gneh_');
         }
         return $this->render('message');
     }
-
 
 
     public function actionInquiryHistory()
@@ -322,6 +323,7 @@ class FirekylinController extends Controller
         }
     }
 
+
     function send_post($url, $params)
     {
         $ch = curl_init();
@@ -338,6 +340,9 @@ class FirekylinController extends Controller
         $res = curl_exec($ch);
         curl_close($ch);
         var_dump($res);
+
+
+
     }
 
 
@@ -347,5 +352,127 @@ class FirekylinController extends Controller
         return $this->render('test');
     }
 
+    public function actionLoginSite()//登陆界面
+    {
+        $model = new LoginSiteForm();
+        if($model->load(Yii::$app->request->post())){
+            if($model->username=='admin'&&$model->password=='admin'){
+                //Yii::$app->user->login(new Admin(),3600*24*30);
+                return $this->redirect('index.php?r=firekylin/send-message');
+            }
+            else {
+                \Yii::$app->getSession()->setFlash('error', 'Incorrect username or password');
+                return $this->goBack('index.php?r=firekylin/login-site');
+            }
+        }
+        else{
+            return $this->render('login',['model'=>$model]);
+        }
+    }
+
 }
+
+//class Admin extends Object implements IdentityInterface
+//{
+//    public $id;
+//    public $username;
+//    public $password;
+//    public $authKey;
+//    public $accessToken;
+//
+//    private static $users = [
+//        '100' => [
+//            'id' => '100',
+//            'username' => 'admin',
+//            'password' => 'admin',
+//            'authKey' => 'test100key',
+//            'accessToken' => '100-token',
+//        ],
+//        '101' => [
+//            'id' => '101',
+//            'username' => 'demo',
+//            'password' => 'demo',
+//            'authKey' => 'test101key',
+//            'accessToken' => '101-token',
+//        ],
+//    ];
+//
+//
+//    /**
+//     * @inheritdoc
+//     */
+//    public static function findIdentity($id)
+//    {
+//        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+//    }
+//
+//    /**
+//     * @inheritdoc
+//     */
+//    public static function findIdentityByAccessToken($token, $type = null)
+//    {
+//        foreach (self::$users as $user) {
+//            if ($user['accessToken'] === $token) {
+//                return new static($user);
+//            }
+//        }
+//
+//        return null;
+//    }
+//
+//    /**
+//     * Finds user by username
+//     *
+//     * @param string $username
+//     * @return static|null
+//     */
+//    public static function findByUsername($username)
+//    {
+//        foreach (self::$users as $user) {
+//            if (strcasecmp($user['username'], $username) === 0) {
+//                return new static($user);
+//            }
+//        }
+//
+//        return null;
+//    }
+//
+//    /**
+//     * @inheritdoc
+//     */
+//    public function getId()
+//    {
+//        return $this->id;
+//    }
+//
+//    /**
+//     * @inheritdoc
+//     */
+//    public function getAuthKey()
+//    {
+//        return $this->authKey;
+//    }
+//
+//    /**
+//     * @inheritdoc
+//     */
+//    public function validateAuthKey($authKey)
+//    {
+//        return $this->authKey === $authKey;
+//    }
+//
+//    /**
+//     * Validates password
+//     *
+//     * @param string $password password to validate
+//     * @return boolean if password provided is valid for current user
+//     */
+//    public function validatePassword($password)
+//    {
+//        return $this->password === $password;
+//    }
+//}
+
+
+
 
