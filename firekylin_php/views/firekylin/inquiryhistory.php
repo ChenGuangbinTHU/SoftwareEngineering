@@ -7,6 +7,7 @@
  */
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+$this->title = 'Inquiry History';
 ?>
 <?php $form = ActiveForm::begin(); ?>
 

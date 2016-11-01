@@ -11,6 +11,7 @@ namespace app\controllers;
 use app\models\HistoryForm;
 use app\models\LoginSiteForm;
 use app\models\Message;
+use app\models\OriginUser;
 use yii\base\Object;
 use yii\web\Controller;
 use app\models\statistic;
@@ -324,6 +325,7 @@ class FirekylinController extends Controller
     }
 
 
+
     function send_post($url, $params)
     {
         $ch = curl_init();
@@ -354,10 +356,15 @@ class FirekylinController extends Controller
 
     public function actionLoginSite()//登陆界面
     {
+
+        if (!Yii::$app->user->isGuest) {
+            return $this->redirect('index.php?r=firekylin/send-message');
+        }
+
         $model = new LoginSiteForm();
         if($model->load(Yii::$app->request->post())){
             if($model->username=='admin'&&$model->password=='admin'){
-                //Yii::$app->user->login(new Admin(),3600*24*30);
+                Yii::$app->user->login(OriginUser::findByUsername("admin"),3600*24*30);
                 return $this->redirect('index.php?r=firekylin/send-message');
             }
             else {
@@ -370,7 +377,11 @@ class FirekylinController extends Controller
         }
     }
 
+
+
+
 }
+
 
 //class Admin extends Object implements IdentityInterface
 //{
@@ -472,7 +483,3 @@ class FirekylinController extends Controller
 //        return $this->password === $password;
 //    }
 //}
-
-
-
-
