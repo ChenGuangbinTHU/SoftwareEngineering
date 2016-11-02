@@ -138,7 +138,7 @@ class FirekylinController extends Controller
         return $this->render('message',['message' => $message]);
     }
 
-    
+
     public function actionInquiryHistory()
     {
         $model = new HistoryForm();
@@ -202,8 +202,11 @@ class FirekylinController extends Controller
                 return $this->redirect('index.php?r=firekylin/send-message');
             }
             else {
-                \Yii::$app->getSession()->setFlash('error', 'Incorrect username or password');
-                return $this->goBack('index.php?r=firekylin/login-site');
+                echo "<script>alert('incorrect username or password');</script>";
+                $model->username = null;
+                $model->password = null;
+
+                return $this->render('login',['model'=>$model]);
             }
         }
         else{
