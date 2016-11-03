@@ -21,3 +21,8 @@ Yii::setAlias('@tests', dirname(__DIR__));
  * @see https://github.com/Codeception/Specify/tree/master/docs
  */
 \Codeception\Specify\Config::setDeepClone(false);
+
+$config = require(__DIR__ . '/../../config/console.php');
+
+
+$application = new yii\console\Application($config);
