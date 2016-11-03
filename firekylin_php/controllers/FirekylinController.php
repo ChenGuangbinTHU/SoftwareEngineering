@@ -198,6 +198,9 @@ class FirekylinController extends Controller
 
     public function actionSendMessage()
     {
+        if (Yii::$app->user->isGuest) {
+            return $this->redirect('index.php?r=firekylin/login-site');
+        }
         $message = new Message();
         $otherInfoArray = array();
         $messageInfoArray = array();
@@ -278,6 +281,9 @@ class FirekylinController extends Controller
 
     public function actionInquiryHistory()
     {
+        if (Yii::$app->user->isGuest) {
+            return $this->redirect('index.php?r=firekylin/login-site');
+        }
         $model = new HistoryForm();
         if ($model->load(Yii::$app->request->post())) {
             $msgID = $model->id;
@@ -350,16 +356,13 @@ class FirekylinController extends Controller
 
     public function actionIndex()
     {
+        //phpinfo();
         //echo(json_encode(['uuid'=>'adssasda','os_type'=>'Android','user_id'=>'213221','channel'=>'getui','device_id'=>'123456','status'=>'RECEIVE']));
-        return $this->render('test');
+        return $this->redirect('index.php?r=firekylin/login-site');
     }
 
     public function actionLoginSite()//登陆界面
     {
-
-        if (!Yii::$app->user->isGuest) {
-            return $this->redirect('index.php?r=firekylin/send-message');
-        }
 
         $model = new LoginSiteForm();
         if($model->load(Yii::$app->request->post())){
@@ -375,6 +378,12 @@ class FirekylinController extends Controller
         else{
             return $this->render('login',['model'=>$model]);
         }
+    }
+
+    public function actionLogout()
+    {
+        Yii::$app->user->logout();
+        return $this->goHome();
     }
 
 
