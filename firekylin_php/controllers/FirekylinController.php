@@ -14,7 +14,7 @@ use app\models\Message;
 use app\models\OriginUser;
 use yii\base\Object;
 use yii\web\Controller;
-use app\models\Statistic;
+use app\models\statistic;
 use app\models\User;
 use app\models\UserDevice;
 use Yii;
@@ -52,7 +52,7 @@ class FirekylinController extends Controller
             $user->id = $post_data['id'];
             $user->name = $post_data['name'];
             $user->password = $post_data['password'];
-            if(User::findOne(['name',$post_data['name']]))
+            if(User::findOne(['name'=>$post_data['name']]))
                 return json_encode(['message'=>'fail']);
             if($user->save())
                 return json_encode(['message'=>'success']);
@@ -70,7 +70,10 @@ class FirekylinController extends Controller
             if(User::findUser($userName))
             {
                 $user_id = User::findOne(['name'=>$userName])->id;
-                return json_encode(['message'=>'success','user_id'=>$user_id]);
+                $password = $post_data['password'];
+                //if($password == User::findOne(['name'=>$userName])->password)
+                    return json_encode(['message'=>'success','user_id'=>$user_id]);
+                //return json_encode(['message'=>'fail','user_id'=>'0']);
             }
             else
             {
