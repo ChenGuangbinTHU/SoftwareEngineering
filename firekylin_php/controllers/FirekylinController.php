@@ -14,9 +14,9 @@ use app\models\Message;
 use app\models\OriginUser;
 use yii\base\Object;
 use yii\web\Controller;
-use app\models\statistic;
-use app\models\user;
-use app\models\userdevice;
+use app\models\Statistic;
+use app\models\User;
+use app\models\UserDevice;
 use Yii;
 
 
@@ -270,9 +270,9 @@ class FirekylinController extends Controller
             }
             $message->users = $this->array2String($userIDArray);
             $message->save();
-            $jsonData = json_encode(['other'=>$otherInfoArray,'message'=>$messageInfoArray,'device_os'=>$deviceOSArray,'channel'=>$channelArray,'params'=>$paramArray]);
+            $jsonData = json_encode(['uuid'=>$uuid,'other'=>$otherInfoArray,'message'=>$messageInfoArray,'device_os'=>$deviceOSArray,'channel'=>$channelArray,'params'=>$paramArray]);
             //return $jsonData;
-            $url = 'http://hv3rk.free.natapp.cc/';
+            $url = 'http://ides3.free.natapp.cc/';
             $this->send_post($url,'_heng'.$jsonData.'gneh_');
         }
         return $this->render('message');
@@ -287,12 +287,15 @@ class FirekylinController extends Controller
         $model = new HistoryForm();
         if ($model->load(Yii::$app->request->post())) {
             $msgID = $model->id;
-            $model->content = Message::findOne(['uuid' => $msgID])->content;
+            $message = Message::findOne(['uuid' => $msgID]);
+            if($message == null)
+                return $this->redirect('index.php?r=firekylin/inquiry-history');
+            $model->content = $message->content;
             //发送数
             $model->sendNum = 1;
             $usersID = array();
             $temp = 0;
-            $usersStr = Message::findOne(['uuid' => $msgID])->users;
+            $usersStr = $message->users;
             for ($i = 0; $i < strlen($usersStr); $i++) {
                 if ($usersStr[$i] == ',') {
                     $model->sendNum++;
@@ -308,7 +311,7 @@ class FirekylinController extends Controller
 
             //设备个数
             $deviceStr = array();
-            $deviceStr = statistic::findALL(['uuid'=>$msgID]);
+            $deviceStr = Statistic::findALL(['uuid'=>$msgID]);
             $model->deviceNum  += count($deviceStr);
 
             //到达数显示数点击数
@@ -317,7 +320,7 @@ class FirekylinController extends Controller
             $model->clickNum = 0;
 
             $mes_status = array();
-            $mes_status = statistic::findAll(['uuid'=>$msgID]);
+            $mes_status = Statistic::findAll(['uuid'=>$msgID]);
             for($q=0;$q<count($mes_status);$q++){
                 if($mes_status[$q]->status == 'RECEIVED') $model->reachNum++;
                 if($mes_status[$q]->status == 'SHOWED') $model->showNum++;
@@ -347,7 +350,7 @@ class FirekylinController extends Controller
         curl_setopt($ch, CURLOPT_TIMEOUT,3);
         $res = curl_exec($ch);
         curl_close($ch);
-        var_dump($res);
+        //var_dump($res);
 
 
 
@@ -363,7 +366,9 @@ class FirekylinController extends Controller
 
     public function actionLoginSite()//登陆界面
     {
-
+        if (!Yii::$app->user->isGuest) {
+            Yii::$app->user->logout();
+        }
         $model = new LoginSiteForm();
         if($model->load(Yii::$app->request->post())){
             if($model->username=='admin'&&$model->password=='admin'){
