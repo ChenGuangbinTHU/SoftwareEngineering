@@ -10,13 +10,9 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Alert;
 $this->title = 'Login';
-
 ?>
 
-
-
 <?php $form = ActiveForm::begin(); ?>
-
 
 <div class = 'firekylin-login'>
     <h1><?= Html::encode($this->title) ?></h1>
@@ -28,6 +24,15 @@ $this->title = 'Login';
             <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
         </div>
     </div>
-
     <?php ActiveForm::end(); ?>
 </div>
+
+<?php
+    if( Yii::$app->getSession()->hasFlash('error') ) {
+    echo Alert::widget([
+        'options' => [
+            'class' => 'alert-error',
+        ],
+        'body' => Yii::$app->getSession()->getFlash('error'),
+    ]);
+}?>

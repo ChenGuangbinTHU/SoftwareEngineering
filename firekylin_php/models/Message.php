@@ -10,12 +10,5 @@ namespace app\models;
 
 class Message extends \yii\db\ActiveRecord
 {
-    public $file;
 
-    public function rules()
-    {
-        return [
-            [['file'],'file'],
-        ];
-    }
 }

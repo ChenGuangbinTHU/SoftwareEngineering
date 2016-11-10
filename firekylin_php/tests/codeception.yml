@@ -19,6 +19,8 @@ actor: Tester
 #            - ../views/*
 #            - ../web/*
 #            - ../tests/*
+coverage:
+    enabled: true
 paths:
     tests: codeception
     log: codeception/_output

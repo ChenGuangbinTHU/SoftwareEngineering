@@ -2,18 +2,13 @@
 /**
  * Created by PhpStorm.
  * User: bingochen
- * Date: 2016/10/10
- * Time: 15:54
+ * Date: 2016/10/19
+ * Time: 23:09
  */
 
 namespace app\models;
 
-use \yii\db\ActiveRecord;
-
-class Statistic extends ActiveRecord
+class Statistic extends \yii\db\ActiveRecord
 {
-    public function test()
-    {
 
-    }
 }
