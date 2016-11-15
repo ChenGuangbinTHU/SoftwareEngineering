@@ -1,11 +1,10 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: bingochen
- * Date: 2016/11/2
- * Time: 22:52
+ * User: 60476
+ * Date: 2016/11/10
+ * Time: 13:51
  */
-
 namespace tests\codeception\unit\models;
 use app\models\User;
 use yii\codeception\TestCase;

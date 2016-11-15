@@ -8,26 +8,33 @@
 namespace tests\codeception\unit\models;
 use app\models\Message;
 use yii\codeception\TestCase;
-class ExampleTest extends TestCase {
-    public function testCreateMyUser() {
+
+
+class MessageTest extends  TestCase{
+    public function  testCreateMyMessage(){
         $m = new Message();
-        $m->name = "myuser";
-        $m->password = "myser@yiibai.com";
+        $m->id = "4";
+        $m->uuid = "4";
         $this->assertTrue($m->save());
     }
-    public function testUpdateMyUser() {
-        $m = new User();
-        $m->name = "myuser2";
-        $m->password = "myser2@yiibai.com";
+
+    public function testUpdateMyMessage() {
+        $m = new Message();
+        $m->id = "6";
+        $m->uuid = "6";
         $this->assertTrue($m->save());
-        $this->assertEquals("myuser2", $m->name);
+        $this->assertEquals("6", $m->id);
     }
-    public function testDeleteMyUser() {
-        $m = User::findOne(['name' => 'myuser2']);
+    public function testDeleteMyMessage() {
+        $m = Message::findOne(['id' => '6']);
         $this->assertNotNull($m);
-        User::deleteAll(['name' => $m->name]);
-        $m = User::findOne(['name' => 'myuser2']);
+        Message::deleteAll(['id' => $m->id]);
+        $m = Message::findOne(['id' => '6']);
         $this->assertNull($m);
     }
 }
 ?>
+
+
+
+
