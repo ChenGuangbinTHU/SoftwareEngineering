@@ -10,7 +10,7 @@ use yii\codeception\BasePage;
  */
 class LoginPage extends BasePage
 {
-    public $route = 'site/login';
+    public $route = 'firekylin/login';
 
     /**
      * @param string $username

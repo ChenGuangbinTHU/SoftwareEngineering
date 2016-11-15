@@ -40,7 +40,7 @@ $this->title = 'Show History';
         <td><?=Html::encode($model->content)?></td>
         <td><?=Html::encode($model->sendNum)?></td>
         <td><?=Html::encode($model->deviceNum)?></td>
-        <td>-<?=Html::encode($model->reachNum)?></td>
+        <td><?=Html::encode($model->reachNum)?></td>
         <td><?=Html::encode($model->showNum)?></td>
         <td><?=Html::encode($model->clickNum)?></td>
     </tr>
