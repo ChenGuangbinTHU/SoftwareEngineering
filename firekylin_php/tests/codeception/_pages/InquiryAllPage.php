@@ -10,5 +10,5 @@ namespace tests\codeception\_pages;
 use yii\codeception\BasePage;
 class InquiryAllPage extends BasePage
 {
-    public $route = 'site/ ,about';
+    public $route = 'firekylin/inquiryall';
 }
