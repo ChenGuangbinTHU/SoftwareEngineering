@@ -14,13 +14,11 @@ use app\models\Message;
 use app\models\OriginUser;
 use yii\base\Object;
 use yii\web\Controller;
-use app\models\Statistic;
+use app\models\statistic;
 use app\models\User;
 use app\models\UserDevice;
-use Yii;
-use yii\grid\GridView;
 use yii\data\ActiveDataProvider;
-
+use Yii;
 
 
 class DeviceOS
@@ -40,6 +38,13 @@ class FirekylinController extends Controller
     public $enableCsrfValidation = false;
     private $uploadPath = '';
 
+    public function beforeAction($action){
+        //Yii::$app->assetManager->publish($path, false, -1, YII_DEBUG);
+        Yii::$app->assetManager->forceCopy = YII_DEBUG;
+
+        return parent::beforeAction($action);
+    }
+
     function __construct($id, $module, $config = [])
     {
         parent::__construct($id, $module, $config = []);
@@ -55,7 +60,7 @@ class FirekylinController extends Controller
             $user->id = $post_data['id'];
             $user->name = $post_data['name'];
             $user->password = $post_data['password'];
-            if(User::findOne(['name',$post_data['name']]))
+            if(User::findOne(['name'=>$post_data['name']]))
                 return json_encode(['message'=>'fail']);
             if($user->save())
                 return json_encode(['message'=>'success']);
@@ -73,7 +78,10 @@ class FirekylinController extends Controller
             if(User::findUser($userName))
             {
                 $user_id = User::findOne(['name'=>$userName])->id;
-                return json_encode(['message'=>'success','user_id'=>$user_id]);
+                $password = $post_data['password'];
+                if($password == User::findOne(['name'=>$userName])->password)
+                    return json_encode(['message'=>'success','user_id'=>$user_id]);
+                return json_encode(['message'=>'fail','user_id'=>'0']);
             }
             else
             {
@@ -387,21 +395,34 @@ class FirekylinController extends Controller
         return $this->goHome();
     }
 
-    public function actionInquiryAll()
-    {
-        $model= new Message();
-        $dataProvider = new ActiveDataProvider([
-            'query'=>Message::find()->orderBy('id'),
-            'pagination' => [
-                'pageSize' => 20,
-            ],
-        ]);
-        return $this->render('inquiryall',[
-            'model'=>$model,
-            'dataProvider'=>$dataProvider,
-        ]);
-    }
 
+    public function actionInquiryAll()
+
+    {
+
+        $model= new Message();
+
+        $dataProvider = new ActiveDataProvider([
+
+            'query'=>Message::find()->orderBy('id'),
+
+            'pagination' => [
+
+                'pageSize' => 20,
+
+            ],
+
+        ]);
+
+        return $this->render('inquiryall',[
+
+            'model'=>$model,
+
+            'dataProvider'=>$dataProvider,
+
+        ]);
+
+    }
 
 
 }

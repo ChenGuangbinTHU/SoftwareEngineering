@@ -12,7 +12,7 @@ use yii\bootstrap\Alert;
 $this->title = 'Login';
 ?>
 
-<?php $form = ActiveForm::begin(); ?>
+<?php $form = ActiveForm::begin([ 'action' => ['firekylin/login-site'], 'method'=>'post'] ); ?>
 
 <div class = 'firekylin-login'>
     <h1><?= Html::encode($this->title) ?></h1>

@@ -23,6 +23,7 @@
                     ['label' => '菜单', 'options' => ['class' => 'header']],
                     ['label' => '发送信息', 'icon' => 'fa fa-file-code-o', 'visible' => !Yii::$app->user->isGuest, 'url' => ['/firekylin/send-message']],
                     ['label' => '查询发送历史', 'icon' => 'fa fa-dashboard', 'visible' => !Yii::$app->user->isGuest, 'url' => ['/firekylin/inquiry-history']],
+
                     ['label' => '查询所有发送历史', 'icon' => 'fa fa-dashboard', 'visible' => !Yii::$app->user->isGuest, 'url' => ['/firekylin/inquiry-all']],
                     ['label' => 'Login', 'icon' => 'fa fa-sign-in','url' => ['firekylin/login-site'], 'visible' => Yii::$app->user->isGuest],
                     ['label' => 'Logout', 'icon' => 'fa fa-sign-out','url' => ['firekylin/logout'], 'visible' => !Yii::$app->user->isGuest],
