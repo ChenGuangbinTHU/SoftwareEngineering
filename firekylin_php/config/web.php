@@ -17,9 +17,32 @@ $config = [
             ],
         ],
 
+        'assetManager' => [
+            'class' => 'yii\web\AssetManager',
+            'forceCopy' => true,
+//            'bundles' => [
+//                'yii\bootstrap\BootstrapAsset' => [
+//                    'forceCopy' => true,
+//                ],
+//            ],
+        ],
+
+        'assetManager' => [
+            'class' => 'yii\web\AssetManager',
+            'forceCopy' => YII_DEBUG,
+
+//            'bundles' => [
+//                'yii\bootstrap\BootstrapAsset' => [
+//                    //'forceCopy' => YII_DEBUG,
+//                ],
+//            ],
+        ],
+
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => '2MhlyGaaGs_uqt_apwy1jLahR_wZ8dBv',
+//            'enableCookieValidation'=>false,
+//            'enableCsrfValidation'=>false,
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
                 'text/json' => 'yii\web\JsonParser',
@@ -75,6 +98,7 @@ if (YII_ENV_DEV) {
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
     ];
+    $config['components']['assetManager']['forceCopy'] = true;
 }
 
 return $config;

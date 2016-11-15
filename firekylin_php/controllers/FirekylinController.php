@@ -37,6 +37,13 @@ class FirekylinController extends Controller
     public $enableCsrfValidation = false;
     private $uploadPath = '';
 
+    public function beforeAction($action){
+        //Yii::$app->assetManager->publish($path, false, -1, YII_DEBUG);
+            Yii::$app->assetManager->forceCopy = YII_DEBUG;
+
+        return parent::beforeAction($action);
+    }
+
     function __construct($id, $module, $config = [])
     {
         parent::__construct($id, $module, $config = []);
@@ -71,9 +78,9 @@ class FirekylinController extends Controller
             {
                 $user_id = User::findOne(['name'=>$userName])->id;
                 $password = $post_data['password'];
-                //if($password == User::findOne(['name'=>$userName])->password)
+                if($password == User::findOne(['name'=>$userName])->password)
                     return json_encode(['message'=>'success','user_id'=>$user_id]);
-                //return json_encode(['message'=>'fail','user_id'=>'0']);
+                return json_encode(['message'=>'fail','user_id'=>'0']);
             }
             else
             {
