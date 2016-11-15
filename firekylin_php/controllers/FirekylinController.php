@@ -17,6 +17,7 @@ use yii\web\Controller;
 use app\models\statistic;
 use app\models\User;
 use app\models\UserDevice;
+use yii\data\ActiveDataProvider;
 use Yii;
 
 
@@ -39,7 +40,7 @@ class FirekylinController extends Controller
 
     public function beforeAction($action){
         //Yii::$app->assetManager->publish($path, false, -1, YII_DEBUG);
-            Yii::$app->assetManager->forceCopy = YII_DEBUG;
+        Yii::$app->assetManager->forceCopy = YII_DEBUG;
 
         return parent::beforeAction($action);
     }
@@ -302,21 +303,14 @@ class FirekylinController extends Controller
                 return $this->redirect('index.php?r=firekylin/inquiry-history');
             $model->content = $message->content;
             //发送数
-            $model->sendNum = 1;
+            $model->sendNum = 0;
             $usersID = array();
             $temp = 0;
             $usersStr = $message->users;
             for ($i = 0; $i < strlen($usersStr); $i++) {
                 if ($usersStr[$i] == ',') {
                     $model->sendNum++;
-                    for ($j = $temp; $j < $i; $j++) {
-                        $usersID[$model->sendNum-2] .= $usersStr[$j];
-                    }
-                    $temp = $i + 1;
                 }
-            }
-            for ($k = $temp; $k < strlen($usersStr); $k++) {
-                $usersID[$model->sendNum - 1] .= $usersStr[$k];
             }
 
             //设备个数
@@ -402,6 +396,33 @@ class FirekylinController extends Controller
     }
 
 
+    public function actionInquiryAll()
+
+    {
+
+        $model= new Message();
+
+        $dataProvider = new ActiveDataProvider([
+
+            'query'=>Message::find()->orderBy('id'),
+
+            'pagination' => [
+
+                'pageSize' => 20,
+
+            ],
+
+        ]);
+
+        return $this->render('inquiryall',[
+
+            'model'=>$model,
+
+            'dataProvider'=>$dataProvider,
+
+        ]);
+
+    }
 
 
 }

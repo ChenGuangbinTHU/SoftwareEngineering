@@ -31,7 +31,7 @@ return [
 
     //配置主服务器组
     'masters' => [
-        ['dsn' => 'mysql:host=168.63.217.199;dbname=firekylin'],
+        ['dsn' => 'mysql:host=207.46.133.186;dbname=firekylin'],
     ],
 
     // 配置从服务器
@@ -49,7 +49,7 @@ return [
 
     // 配置从服务器组
     'slaves' => [
-    ['dsn' => 'mysql:host=207.46.133.186;dbname=firekylin'],
+
         ['dsn' => 'mysql:host=13.75.113.54;dbname=firekylin'],
 ],
 
