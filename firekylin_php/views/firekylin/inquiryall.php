@@ -12,7 +12,7 @@ $this->title = 'Inquiry All History';
 ?>
 
 <?=
-GridView::widget([
+yii\grid\GridView::widget([
     'dataProvider' => $dataProvider,
     'columns' => [
         'id',

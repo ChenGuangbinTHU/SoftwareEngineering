@@ -23,9 +23,21 @@ use yii\helpers\Html;
 ?>
 
 
+<script type="text/javascript">
+    function file_show(){
+        $("#file_group").show();
+    }
+
+    function file_hide() {
+        $("#file_group").hide();
+    }
+</script>
+
 
 <form action="index.php?r=firekylin%2Fsend-message" method="post" accept-charset="utf-8"
       enctype="multipart/form-data">
+
+
 
     <div class="form-group">
         <label for="name">推送标题</label>
@@ -62,7 +74,18 @@ use yii\helpers\Html;
         </label>
     </div>
 
-    <div class="form-group">
+    <label for="name">请选择要发送的用户类型</label>
+    <div align="left">
+        <label class="radio-inline">
+            <input type="radio" id="alluser" value="alluser" name="user_choices" onclick="file_hide()"/>所有用户
+        </label>
+
+        <label class="radio-inline">
+            <input type="radio" id="specificuser" value="specificuser" name="user_choices" onclick="file_show()" checked/>登录用户
+        </label>
+    </div>
+
+    <div class="form-group" id="file_group">
         <label for="file">请上传包含用户ID的Excel文件</label>
         <input type="file" name="file" id="file" />
         <br />

@@ -128,7 +128,7 @@ class FirekylinController extends Controller
         if(Yii::$app->request->isPost)
         {
             $post_data = Yii::$app->request->post();
-            $statistic = Statistic::findOne(['uuid'=>$post_data['uuid']]);
+            $statistic = Statistic::findOne(['uuid'=>$post_data['uuid'],'device_id'=>$post_data['device_id']]);
             if($statistic == null)
                 $statistic = new Statistic();
             $statistic->uuid = $post_data['uuid'];
@@ -256,34 +256,76 @@ class FirekylinController extends Controller
                 return $this->render('message');
             }
 
-            if ($_FILES["file"]["type"] == "application/vnd.ms-excel" || $_FILES["file"]["type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            if($post_data['user_choices'] == "specificuser")
             {
-                $filepath = "upload/" . $_FILES["file"]["name"];
-                $this->fileExists("upload/");
-                move_uploaded_file($_FILES["file"]["tmp_name"],
-                    $filepath);
-                $userIDArray = $this->parseExcel($filepath);
+                if ($_FILES["file"]["type"] == "application/vnd.ms-excel" || $_FILES["file"]["type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                {
+                    $filepath = "upload/" . $_FILES["file"]["name"];
+                    $this->fileExists("upload/");
+                    move_uploaded_file($_FILES["file"]["tmp_name"],
+                        $filepath);
+                    $userIDArray = $this->parseExcel($filepath);
+                }
+                else
+                {
+                    echo "<script>alert('请上传Excel文件');</script>";
+                    return $this->render('message');
+                }
+
+                foreach($userIDArray as $userID)
+                {
+                    $userDeviceArray = UserDevice::findAll(['user_id'=>$userID]);
+                    foreach($userDeviceArray as $i)
+                    {
+                        if(in_array($i->os_type,$osTypeArray))
+                        {
+                            array_push($deviceOSArray,new DeviceOS($i->os_type,$i->device_id));
+                            $statistic = new Statistic();
+                            $statistic->uuid = $uuid;
+                            $statistic->user_id = $userID;
+                            $statistic->os_type = $i->os_type;
+                            $statistic->channel = $channelArray[0];
+                            $statistic->device_id = $i->device_id;
+                            $statistic->status = "receive";
+                            $statistic->save();
+                        }
+
+                    }
+                }
             }
             else
             {
-                echo "<script>alert('请上传Excel文件');</script>";
-                return $this->render('message');
-            }
-
-            foreach($userIDArray as $userID)
-            {
-                $userDeviceArray = UserDevice::findAll(['user_id'=>$userID]);
+                //$sql = 'SELECT id FROM user where 1';
+                $userIDArray = array();
+                $userID = User::find()->all();
+                foreach($userID as $i)
+                {
+                    array_push($userIDArray,$i->id);
+                }
+                $userDeviceArray = UserDevice::findAll(['channel'=>$channelArray[0]]);
+                $count = 0;
                 foreach($userDeviceArray as $i)
                 {
                     if(in_array($i->os_type,$osTypeArray))
+                    {
                         array_push($deviceOSArray,new DeviceOS($i->os_type,$i->device_id));
+                        $statistic = new Statistic();
+                        $statistic->uuid = $uuid;
+                        $statistic->user_id = $userIDArray[$count++];
+                        $statistic->os_type = $i->os_type;
+                        $statistic->channel = $channelArray[0];
+                        $statistic->device_id = $i->device_id;
+                        $statistic->status = "receive";
+                        $statistic->save();
+                    }
+
                 }
             }
             $message->users = $this->array2String($userIDArray);
             $message->save();
             $jsonData = json_encode(['uuid'=>$uuid,'other'=>$otherInfoArray,'message'=>$messageInfoArray,'device_os'=>$deviceOSArray,'channel'=>$channelArray,'params'=>$paramArray]);
             //return $jsonData;
-            $url = 'http://ides3.free.natapp.cc/';
+            $url = 'http://firekylin.eastasia.cloudapp.azure.com/';
             $this->send_post($url,'_heng'.$jsonData.'gneh_');
         }
         return $this->render('message');
@@ -326,8 +368,8 @@ class FirekylinController extends Controller
             $mes_status = array();
             $mes_status = Statistic::findAll(['uuid'=>$msgID]);
             for($q=0;$q<count($mes_status);$q++){
-                if($mes_status[$q]->status == 'RECEIVED') $model->reachNum++;
-                if($mes_status[$q]->status == 'SHOWED') $model->showNum++;
+                if($mes_status[$q]->status == 'SHOWED' || $mes_status[$q]->status == 'CLICKED') $model->reachNum++;
+                if($mes_status[$q]->status == 'SHOWED' || $mes_status[$q]->status == 'CLICKED') $model->showNum++;
                 if($mes_status[$q]->status == 'CLICKED') $model->clickNum++;
             }
             return $this->render('showhistory', ['model' => $model]);
@@ -397,31 +439,18 @@ class FirekylinController extends Controller
 
 
     public function actionInquiryAll()
-
     {
-
         $model= new Message();
-
         $dataProvider = new ActiveDataProvider([
-
             'query'=>Message::find()->orderBy('id'),
-
             'pagination' => [
-
                 'pageSize' => 20,
-
             ],
-
         ]);
-
         return $this->render('inquiryall',[
-
             'model'=>$model,
-
             'dataProvider'=>$dataProvider,
-
         ]);
-
     }
 
 
