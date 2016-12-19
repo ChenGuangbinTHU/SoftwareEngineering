@@ -27,12 +27,3 @@ $this->title = 'Login';
     <?php ActiveForm::end(); ?>
 </div>
 
-<?php
-    if( Yii::$app->getSession()->hasFlash('error') ) {
-    echo Alert::widget([
-        'options' => [
-            'class' => 'alert-error',
-        ],
-        'body' => Yii::$app->getSession()->getFlash('error'),
-    ]);
-}?>
